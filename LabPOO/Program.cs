@@ -5,16 +5,31 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
+using System.IO;
+using System.Runtime.Serialization.Formatters.Binary;
+
+delegate bool puedeComprar();
+
 namespace LabPOO
 {
     class Program
     {
-        public static List<Product> cart;
+
+        public static List<Product> cart = new List<Product>();
         public static List<Product> market;
+        public static List<String> receta = new List<String>();
+        public static List<double> cantidad = new List<double>();
 
         static void Main(string[] args)
         {
-            cart = new List<Product>();
+            try
+            {
+                BinaryFormatter formateador = new BinaryFormatter();
+                Stream miStream = new FileStream("Productos.bin", FileMode.Open, FileAccess.Read, FileShare.None);
+                cart = (List<Product>)formateador.Deserialize(miStream);
+                miStream.Close();
+            }
+            catch {  }
             market = new List<Product>();
             SupplyStore();
             while (true)
@@ -51,7 +66,11 @@ namespace LabPOO
                     }
                     else if (answer == "5")
                     {
-                        Environment.Exit(1);
+                            BinaryFormatter formateador = new BinaryFormatter();
+                            Stream miStreamW = new FileStream("Productos.bin", FileMode.Create, FileAccess.Write);
+                            formateador.Serialize(miStreamW, cart);
+                            miStreamW.Close();
+                            Environment.Exit(1);
                     }
                 }
             }
@@ -61,7 +80,7 @@ namespace LabPOO
         {
             PrintHeader();
             int total = 0;
-            for (int i = 0; i < cart.Count; i++)
+            for (int i = 0; i < cart.Count(); i++)
             {
                 total += cart[i].Price;
             }
@@ -99,7 +118,7 @@ namespace LabPOO
                 {
                     continue;
                 }
-            }           
+            }
         }
 
         public static void PrintCart()
@@ -161,6 +180,11 @@ namespace LabPOO
             market.Add(new Product("Bolsa de Zanahorias", 890, 74, "1un"));
         }
 
+        public void puedeAgregar(Product producto, Product comprado)
+        {
+            if (producto == comprado) {  }
+        }
+
         public static void ShowRecipe()
         {
             Console.Clear();
@@ -186,6 +210,19 @@ namespace LabPOO
             Console.WriteLine("\tPimienta\n\n");
             Console.WriteLine("Presiona ENTER para volver al supermercado...");
             ConsoleKeyInfo response = Console.ReadKey(true);
+            receta.Add("Láminas de Lasaña");cantidad.Add(12);
+            receta.Add("Queso Rallado Parmesano"); cantidad.Add(70);
+            receta.Add("Mantequilla"); cantidad.Add(2);
+            receta.Add("Carne Molida"); cantidad.Add(2);
+            receta.Add("Vino Blanco Caja"); cantidad.Add(1);
+            receta.Add("Tomates Pelados en lata"); cantidad.Add(3);
+            receta.Add("Bolsa de Zanahorias"); cantidad.Add(1);
+            receta.Add("Malla de Cebollas"); cantidad.Add(1);
+            receta.Add("Aceite de Oliva"); cantidad.Add(1);
+            receta.Add("Sal Lobos"); cantidad.Add(2); 
+            receta.Add("Pimienta"); cantidad.Add(1);
+            receta.Add("Harina"); cantidad.Add(1);
+            receta.Add("Leche Entera"); cantidad.Add(1);
             while (response.Key != ConsoleKey.Enter)
             {
                 response = Console.ReadKey(true);
